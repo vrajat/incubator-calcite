@@ -750,6 +750,7 @@ public class Lattice {
     private Column resolveColumnByAlias(String name) {
       final ImmutableList<Column> list = columnsByAlias.get(name);
       if (list == null || list.size() == 0) {
+        System.out.println("Unknown lattice column '" + name + "'");
         throw new RuntimeException("Unknown lattice column '" + name + "'");
       } else if (list.size() == 1) {
         return list.get(0);
