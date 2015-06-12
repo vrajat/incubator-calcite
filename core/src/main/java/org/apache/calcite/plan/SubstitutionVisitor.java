@@ -30,11 +30,7 @@ import org.apache.calcite.rel.core.JoinRelType;
 import org.apache.calcite.rel.core.Project;
 import org.apache.calcite.rel.core.TableScan;
 import org.apache.calcite.rel.core.Values;
-import org.apache.calcite.rel.logical.LogicalAggregate;
-import org.apache.calcite.rel.logical.LogicalFilter;
-import org.apache.calcite.rel.logical.LogicalProject;
-import org.apache.calcite.rel.logical.LogicalSort;
-import org.apache.calcite.rel.logical.LogicalUnion;
+import org.apache.calcite.rel.logical.*;
 import org.apache.calcite.rel.rules.ProjectRemoveRule;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeField;
@@ -618,6 +614,10 @@ public class SubstitutionVisitor {
     case UNION:
       final MutableUnion union = (MutableUnion) node;
       return LogicalUnion.create(fromMutables(union.inputs), union.all);
+    case JOIN:
+      final MutableJoin join = (MutableJoin) node;
+      return LogicalJoin.create(fromMutable(join.getLeft()), fromMutable(join.getRight()),
+          join.getCondition(), join.getJoinType(), join.getVariablesStopped());
     default:
       throw new AssertionError(node.deep());
     }
@@ -1911,6 +1911,10 @@ public class SubstitutionVisitor {
 
     public JoinRelType getJoinType() {
       return joinType;
+    }
+
+    public ImmutableSet getVariablesStopped() {
+      return variablesStopped;
     }
 
     static MutableJoin of(RelOptCluster cluster, MutableRel left, MutableRel right,

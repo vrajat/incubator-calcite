@@ -131,8 +131,8 @@ public class LatticeTest {
   @Test public void testLatticeSqlWithUnionFails() {
     modelWithLattice("star",
         "select 1 from \"foodmart\".\"sales_fact_1997\" as s\n"
-            + "union all\n"
-            + "select 1 from \"foodmart\".\"sales_fact_1997\" as s")
+        + "union all\n"
+        + "select 1 from \"foodmart\".\"sales_fact_1997\" as s")
         .connectThrows("Invalid node type LogicalUnion in lattice query");
   }
 
@@ -317,22 +317,22 @@ public class LatticeTest {
     MaterializationService.instance().clear();
     foodmartModel(
         " auto: false,\n"
-            + "  algorithm: true,\n"
-            + "  algorithmMaxMillis: -1,\n"
-            + "  rowCountEstimate: 86000,\n"
-            + "  defaultMeasures: [ {\n"
-            + "      agg: 'sum',\n"
-            + "      args: 'unit_sales'\n"
-            + "    }, {\n"
-            + "      agg: 'sum',\n"
-            + "      args: 'store_sales'\n"
-            + "    }, {\n"
-            + "      agg: 'count'\n"
-            + "  } ],\n"
-            + "  tiles: [ {\n"
-            + "    dimensions: [ 'the_year', ['t', 'quarter'] ],\n"
-            + "    measures: [ ]\n"
-            + "  } ]\n")
+        + "  algorithm: true,\n"
+        + "  algorithmMaxMillis: -1,\n"
+        + "  rowCountEstimate: 86000,\n"
+        + "  defaultMeasures: [ {\n"
+        + "      agg: 'sum',\n"
+        + "      args: 'unit_sales'\n"
+        + "    }, {\n"
+        + "      agg: 'sum',\n"
+        + "      args: 'store_sales'\n"
+        + "    }, {\n"
+        + "      agg: 'count'\n"
+        + "  } ],\n"
+        + "  tiles: [ {\n"
+        + "    dimensions: [ 'the_year', ['t', 'quarter'] ],\n"
+        + "    measures: [ ]\n"
+        + "  } ]\n")
         .query("select distinct t.\"the_year\", t.\"quarter\"\n"
             + "from \"foodmart\".\"sales_fact_1997\" as s\n"
             + "join \"foodmart\".\"time_by_day\" as t using (\"time_id\")\n")
