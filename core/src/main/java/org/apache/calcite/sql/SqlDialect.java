@@ -56,6 +56,7 @@ public class SqlDialect {
   private final String identifierEndQuoteString;
   private final String identifierEscapedQuote;
   private final DatabaseProduct databaseProduct;
+  private final boolean useLimitKeyWord;
 
   //~ Constructors -----------------------------------------------------------
 
@@ -101,6 +102,26 @@ public class SqlDialect {
       DatabaseProduct databaseProduct,
       String databaseProductName,
       String identifierQuoteString) {
+    this(databaseProduct, databaseProductName, identifierQuoteString, false);
+  }
+
+  /**
+   * Creates a SqlDialect.
+   *
+   * @param databaseProduct       Database product; may be UNKNOWN, never null
+   * @param databaseProductName   Database product name from JDBC driver
+   * @param identifierQuoteString String to quote identifiers. Null if quoting
+   *                              is not supported. If "[", close quote is
+   *                              deemed to be "]".
+   *@param useLimitKeyWord        Indicates if LIMIT keyword needs to be used
+   *                              when serializing through
+   *                              {@link SqlOrderBy#unparse(SqlWriter, int, int)}
+   */
+  public SqlDialect(
+      DatabaseProduct databaseProduct,
+      String databaseProductName,
+      String identifierQuoteString,
+      boolean useLimitKeyWord) {
     assert databaseProduct != null;
     assert databaseProductName != null;
     this.databaseProduct = databaseProduct;
@@ -121,6 +142,7 @@ public class SqlDialect {
         identifierQuoteString == null
             ? null
             : this.identifierEndQuoteString + this.identifierEndQuoteString;
+    this.useLimitKeyWord = useLimitKeyWord;
   }
 
   //~ Methods ----------------------------------------------------------------
@@ -467,6 +489,10 @@ public class SqlDialect {
     }
   }
 
+  public boolean isUseLimitKeyWord() {
+    return useLimitKeyWord;
+  }
+
   /**
    * Rough list of flavors of database.
    *
@@ -488,14 +514,14 @@ public class SqlDialect {
     DERBY("Apache Derby", null),
     DB2("IBM DB2", null),
     FIREBIRD("Firebird", null),
-    H2("H2", "\""),
-    HIVE("Apache Hive", null),
+    H2("H2", "\"", true),
+    HIVE("Apache Hive", null, true),
     INFORMIX("Informix", null),
     INGRES("Ingres", null),
     LUCIDDB("LucidDB", "\""),
     INTERBASE("Interbase", null),
     PHOENIX("Phoenix", "\""),
-    POSTGRESQL("PostgreSQL", "\""),
+    POSTGRESQL("PostgreSQL", "\"", true),
     NETEZZA("Netezza", "\""),
     INFOBRIGHT("Infobright", "`"),
     NEOVIEW("Neoview", null),
@@ -517,10 +543,17 @@ public class SqlDialect {
     private SqlDialect dialect = null;
     private String databaseProductName;
     private String quoteString;
+    private boolean useLimitKeyWord;
 
-    DatabaseProduct(String databaseProductName, String quoteString) {
+    DatabaseProduct(String databaseProductName, String quoteString,
+        boolean useLimitKeyWord) {
       this.databaseProductName = databaseProductName;
       this.quoteString = quoteString;
+      this.useLimitKeyWord = useLimitKeyWord;
+    }
+
+    DatabaseProduct(String databaseProductName, String quoteString) {
+      this(databaseProductName, quoteString, false);
     }
 
     /**
@@ -537,7 +570,7 @@ public class SqlDialect {
     public SqlDialect getDialect() {
       if (dialect == null) {
         dialect =
-            new SqlDialect(this, databaseProductName, quoteString);
+            new SqlDialect(this, databaseProductName, quoteString, useLimitKeyWord);
       }
       return dialect;
     }

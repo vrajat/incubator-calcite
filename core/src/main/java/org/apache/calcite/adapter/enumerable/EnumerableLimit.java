@@ -27,7 +27,7 @@ import org.apache.calcite.rel.RelDistribution;
 import org.apache.calcite.rel.RelDistributionTraitDef;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.RelWriter;
-import org.apache.calcite.rel.SingleRel;
+import org.apache.calcite.rel.core.Limit;
 import org.apache.calcite.rel.metadata.RelMdCollation;
 import org.apache.calcite.rel.metadata.RelMdDistribution;
 import org.apache.calcite.rex.RexLiteral;
@@ -39,10 +39,7 @@ import com.google.common.base.Supplier;
 import java.util.List;
 
 /** Relational expression that applies a limit and/or offset to its input. */
-public class EnumerableLimit extends SingleRel implements EnumerableRel {
-  private final RexNode offset;
-  private final RexNode fetch;
-
+public class EnumerableLimit extends Limit implements EnumerableRel {
   /** Creates an EnumerableLimit.
    *
    * <p>Use {@link #create} unless you know what you're doing. */
@@ -52,9 +49,7 @@ public class EnumerableLimit extends SingleRel implements EnumerableRel {
       RelNode input,
       RexNode offset,
       RexNode fetch) {
-    super(cluster, traitSet, input);
-    this.offset = offset;
-    this.fetch = fetch;
+    super(cluster, traitSet, input, offset, fetch);
     assert getConvention() instanceof EnumerableConvention;
     assert getConvention() == input.getConvention();
   }
@@ -88,14 +83,14 @@ public class EnumerableLimit extends SingleRel implements EnumerableRel {
         getCluster(),
         traitSet,
         sole(newInputs),
-        offset,
-        fetch);
+        getOffset(),
+        getFetch());
   }
 
   @Override public RelWriter explainTerms(RelWriter pw) {
     return super.explainTerms(pw)
-        .itemIf("offset", offset, offset != null)
-        .itemIf("fetch", fetch, fetch != null);
+        .itemIf("offset", getOffset(), getOffset() != null)
+        .itemIf("fetch", getFetch(), getFetch() != null);
   }
 
   public Result implement(EnumerableRelImplementor implementor, Prefer pref) {
@@ -109,21 +104,21 @@ public class EnumerableLimit extends SingleRel implements EnumerableRel {
             result.format);
 
     Expression v = builder.append("child", result.block);
-    if (offset != null) {
+    if (getOffset() != null) {
       v = builder.append(
           "offset",
           Expressions.call(
               v,
               BuiltInMethod.SKIP.method,
-              Expressions.constant(RexLiteral.intValue(offset))));
+              Expressions.constant(RexLiteral.intValue(getOffset()))));
     }
-    if (fetch != null) {
+    if (getFetch() != null) {
       v = builder.append(
           "fetch",
           Expressions.call(
               v,
               BuiltInMethod.TAKE.method,
-              Expressions.constant(RexLiteral.intValue(fetch))));
+              Expressions.constant(RexLiteral.intValue(getFetch()))));
     }
 
     builder.add(

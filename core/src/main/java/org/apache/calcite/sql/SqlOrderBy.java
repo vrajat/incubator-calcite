@@ -95,25 +95,35 @@ public class SqlOrderBy extends SqlCall {
         unparseListClause(writer, orderBy.orderList);
         writer.endList(listFrame);
       }
+      final boolean useLimit = writer.getDialect().isUseLimitKeyWord();
       if (orderBy.offset != null) {
         final SqlWriter.Frame frame2 =
             writer.startList(SqlWriter.FrameTypeEnum.OFFSET);
         writer.newlineAndIndent();
         writer.keyword("OFFSET");
         orderBy.offset.unparse(writer, -1, -1);
-        writer.keyword("ROWS");
+        if (!useLimit) {
+          writer.keyword("ROWS");
+        }
         writer.endList(frame2);
       }
       if (orderBy.fetch != null) {
         final SqlWriter.Frame frame3 =
             writer.startList(SqlWriter.FrameTypeEnum.FETCH);
-        writer.newlineAndIndent();
-        writer.keyword("FETCH");
-        writer.keyword("NEXT");
-        orderBy.fetch.unparse(writer, -1, -1);
-        writer.keyword("ROWS");
-        writer.keyword("ONLY");
-        writer.endList(frame3);
+        if (useLimit) {
+          writer.newlineAndIndent();
+          writer.keyword("LIMIT");
+          orderBy.fetch.unparse(writer, -1, -1);
+          writer.endList(frame3);
+        } else {
+          writer.newlineAndIndent();
+          writer.keyword("FETCH");
+          writer.keyword("NEXT");
+          orderBy.fetch.unparse(writer, -1, -1);
+          writer.keyword("ROWS");
+          writer.keyword("ONLY");
+          writer.endList(frame3);
+        }
       }
       writer.endList(frame);
     }
