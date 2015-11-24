@@ -509,7 +509,7 @@ public class SqlDialect {
     ACCESS("Access", "\""),
     CALCITE("Apache Calcite", "\""),
     MSSQL("Microsoft SQL Server", "["),
-    MYSQL("MySQL", "`"),
+    MYSQL("MySQL", "`", true),
     ORACLE("Oracle", "\""),
     DERBY("Apache Derby", null),
     DB2("IBM DB2", null),
