@@ -56,7 +56,7 @@ public class SqlDialect {
   private final String identifierEndQuoteString;
   private final String identifierEscapedQuote;
   private final DatabaseProduct databaseProduct;
-  private final boolean useLimitKeyWord;
+  private boolean useLimitKeyWord;
 
   //~ Constructors -----------------------------------------------------------
 
@@ -493,6 +493,10 @@ public class SqlDialect {
     return useLimitKeyWord;
   }
 
+  public void setUseLimitKeyWord(boolean useLimitKeyWord) {
+    this.useLimitKeyWord = useLimitKeyWord;
+  }
+
   /**
    * Rough list of flavors of database.
    *
@@ -509,19 +513,19 @@ public class SqlDialect {
     ACCESS("Access", "\""),
     CALCITE("Apache Calcite", "\""),
     MSSQL("Microsoft SQL Server", "["),
-    MYSQL("MySQL", "`", true),
+    MYSQL("MySQL", "`"),
     ORACLE("Oracle", "\""),
     DERBY("Apache Derby", null),
     DB2("IBM DB2", null),
     FIREBIRD("Firebird", null),
     H2("H2", "\"", true),
-    HIVE("Apache Hive", null, true),
+    HIVE("Apache Hive", null),
     INFORMIX("Informix", null),
     INGRES("Ingres", null),
     LUCIDDB("LucidDB", "\""),
     INTERBASE("Interbase", null),
     PHOENIX("Phoenix", "\""),
-    POSTGRESQL("PostgreSQL", "\"", true),
+    POSTGRESQL("PostgreSQL", "\""),
     NETEZZA("Netezza", "\""),
     INFOBRIGHT("Infobright", "`"),
     NEOVIEW("Neoview", null),
