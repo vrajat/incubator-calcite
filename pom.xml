@@ -619,14 +619,14 @@ limitations under the License.
 
   <distributionManagement>
     <repository>
-      <id>qubole-releases</id>
-      <name>karma.qubole.net-releases</name>
-      <url>http://karma.qubole.net:4000/artifactory/libs-release-local</url>
+      <id>${distMgmtStagingId}</id>
+      <name>${distMgmtStagingName}</name>
+      <url>${distMgmtStagingUrl}</url>
     </repository>
     <snapshotRepository>
-      <id>qubole-snapshots</id>
-      <name>karma.qubole.net-snapshots</name>
-      <url>http://karma.qubole.net:4000/artifactory/libs-snapshot-local</url>
+      <id>${distMgmtSnapshotsId}</id>
+      <name>${distMgmtSnapshotsName}</name>
+      <url>${distMgmtSnapshotsUrl}</url>
     </snapshotRepository>
   </distributionManagement>
 
