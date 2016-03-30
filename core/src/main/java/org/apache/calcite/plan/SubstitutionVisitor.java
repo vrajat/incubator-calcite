@@ -1609,7 +1609,7 @@ public class SubstitutionVisitor {
     @Override public boolean equals(Object obj) {
       return obj == this
           || obj instanceof MutableScan
-          && rel == ((MutableScan) obj).rel;
+          && rel.equals(((MutableScan) obj).rel);
     }
 
     @Override public int hashCode() {
