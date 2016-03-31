@@ -272,6 +272,9 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
   private final SetMultimap<String, Class> ruleNames =
       LinkedHashMultimap.create();
 
+  private final List<RelOptMaterialization> applicableMaterializations =
+      Lists.newArrayList();
+
   //~ Constructors -----------------------------------------------------------
 
   /**
@@ -476,7 +479,7 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
     final Graphs.FrozenGraph<List<String>, DefaultEdge> frozenGraph =
         Graphs.makeImmutable(usesGraph);
     final Set<RelOptTable> queryTables = findTables(originalRoot);
-    final List<RelOptMaterialization> applicableMaterializations = Lists.newArrayList();
+    applicableMaterializations.clear();
     for (List<String> qname : TopologicalOrderIterator.of(usesGraph)) {
       RelOptMaterialization materialization = qnameMap.get(qname);
       if (materialization != null
@@ -1876,6 +1879,10 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
     } else {
       return subset.timestamp;
     }
+  }
+
+  public List<RelOptMaterialization> getApplicableMaterializations() {
+    return applicableMaterializations;
   }
 
   /**
