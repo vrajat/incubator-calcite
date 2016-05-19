@@ -80,6 +80,7 @@ import org.apache.calcite.sql.SqlSampleSpec;
 import org.apache.calcite.sql.SqlSelect;
 import org.apache.calcite.sql.SqlSelectKeyword;
 import org.apache.calcite.sql.SqlSetOption;
+import org.apache.calcite.sql.SqlShowQuark;
 import org.apache.calcite.sql.SqlTimeLiteral;
 import org.apache.calcite.sql.SqlTimestampLiteral;
 import org.apache.calcite.sql.SqlUnnestOperator;
@@ -955,6 +956,8 @@ SqlNode SqlStmt() :
         stmt = SqlAlterQuarkView()
         |
         stmt = SqlDropQuarkView()
+        |
+        stmt = SqlShowQuark()
 
       <#-- Add methods to parse additional statements here -->
       <#list parser.statementParserMethods as method>
@@ -1503,6 +1506,38 @@ SqlNode SqlDropQuarkView() :
         return new SqlDropQuarkView(pos, condition);
     }
 }
+
+/**
+ * Parses a SHOW DDL statement.
+ */
+SqlNode SqlShowQuark() :
+{
+    SqlNode condition;
+    SqlParserPos pos;
+    SqlIdentifier quarkEntity;
+}
+{
+    <SHOW>
+    {
+        pos = getPos();
+    }
+    (
+        <DATASOURCE>
+        {
+            quarkEntity = new SqlIdentifier("DATASOURCE", getPos());
+        }
+        |
+        <VIEW>
+        {
+            quarkEntity = new SqlIdentifier("VIEW", getPos());
+        }
+    )
+    condition = WhereOpt()
+    {
+        return new SqlShowQuark(pos, quarkEntity, condition);
+    }
+}
+
 
 /**
  * Parses a MERGE statement.
@@ -5340,6 +5375,7 @@ SqlPostfixOperator PostfixRowOperator() :
     | < SESSION_USER: "SESSION_USER" >
     | < SET: "SET" >
     | < SETS: "SETS" >
+    | < SHOW: "SHOW" >
     | < SIMILAR: "SIMILAR" >
     | < SIMPLE: "SIMPLE" >
     | < SIZE: "SIZE" >
